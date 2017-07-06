@@ -1,0 +1,27 @@
+{
+  "name": "react-native-geofencer",
+  "version": "0.0.1",
+  "description": "Geofencing library for React-Native",
+  "cordova": {
+    "id": "react-native-geofencer",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/orhan/react-native-geofencer.git"
+  },
+  "keywords": [
+    "react-native",
+    "geofence",
+    "ecosystem:react-native"
+  ],
+  "author": "Orhan Sönmez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/orhan/react-native-geofencer/issues"
+  },
+  "homepage": "https://github.com/orhan/react-native-geofencer#readme"
+}
