@@ -2,8 +2,13 @@
 
 /* --- Imports --- */
 
-import {DeviceEventEmitter, NativeModules} from 'react-native';
+import {NativeAppEventEmitter, NativeModules} from 'react-native';
 const RNGeofencer = NativeModules.Geofencer;
+
+
+/* --- Member variables --- */
+
+let geofenceListeners = [];
 
 
 /* --- Class methods --- */
@@ -22,6 +27,8 @@ const GeoFencer = {
    * Initializing geofencer plugin.
    */
   initialize: function () {
+    NativeAppEventEmitter.addListener('GeofencerOnTransitionReceived', this.onTransitionReceived);
+
     return new Promise((success, failed) => {
       RNGeofencer.initialize(
         (data) => {
@@ -32,6 +39,29 @@ const GeoFencer = {
         }
       );
     });
+  },
+
+  /**
+   * Remove all native app event listeners.
+   */
+  destroy: function() {
+    NativeAppEventEmitter.removeListener('GeofencerOnTransitionReceived', this.onTransitionReceived);
+  },
+
+  /**
+   * Adds a listener for receiving geofence events.
+   */
+  addListener: function(listener) {
+    geofenceListeners.push(listener);
+  },
+
+  /**
+   * Removes a listener.
+   */
+  removeListener: function(listener) {
+    if (geofenceListeners.indexOf(listener) !== -1) {
+      geofenceListeners.splice(geofenceListeners.indexOf(listener), 1);
+    }
   },
 
   /**
