@@ -152,11 +152,12 @@ const GeoFencer = {
 
   /**
    * Called when app received geofence transition event
-   * @param  {Array} geofences
+   * @param  {JSON} geofence
    */
-  onTransitionReceived: function (geofences) {
-    console.log("RECEIVED TRANSITION:");
-    console.log(geofences);
+  onTransitionReceived: function (geofence) {
+    geofenceListeners.forEach((geofenceListener) => {
+      geofenceListener(geofence);
+    });
   },
 };
 
