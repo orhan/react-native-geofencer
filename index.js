@@ -114,7 +114,7 @@ const GeoFencer = {
    *
    * @return {Promise}
    */
-  removeAll: function (success, error) {
+  removeAll: function () {
     return new Promise((success, failed) => {
       RNGeofencer.removeAll(
         () => {
@@ -125,8 +125,6 @@ const GeoFencer = {
         }
       );
     });
-
-    return RNGeofencer.removeAll(success, error);
   },
 
   /**
@@ -137,8 +135,10 @@ const GeoFencer = {
    * @param  {Function} error callback
    * @return {Promise} if successful returns geofences array stringify to JSON
    */
-  getWatched: function (success, error) {
-    return RNGeofencer.getWatched(success, error);
+  getWatched: function () {
+    return new Promise((success, failed) => {
+      RNGeofencer.getWatched((watched) => {success(watched)}, (error) => {failed(error)});
+    });
   },
 
   /**
