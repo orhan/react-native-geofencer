@@ -341,7 +341,7 @@ class GeoNotificationManager : CLLocationManager, CLLocationManagerDelegate {
 
     func handleTransition(region: CLRegion!, transitionType: Int) {
         do {
-            logMessage(message: "Geofence Event occurred - Firing local notification")
+            logMessage(message: "Geofence Event - Firing local notification")
 
             if var geoNotification = try store.findById(id: region.identifier) {
                 if isWithinTimeRange(geoNotification: geoNotification) {
@@ -352,10 +352,11 @@ class GeoNotificationManager : CLLocationManager, CLLocationManagerDelegate {
                     }
 
                     NotificationCenter.default.post(name: NSNotification.Name(rawValue: "handleTransition"), object: geoNotification.rawString(String.Encoding.utf8, options: []))
+                    logMessage(message: "Geofence Event - Local notification fired")
                 }
             }
         } catch {
-            // EMPTY!
+            logMessage(message: "Geofence Event - Error firing local notification: \(error)")
         }
     }
 
