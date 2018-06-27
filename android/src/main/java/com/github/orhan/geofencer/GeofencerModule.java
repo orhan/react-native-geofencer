@@ -54,14 +54,6 @@ public class GeofencerModule extends ReactContextBaseJavaModule {
             }
 
             context.getJSModule(RCTNativeAppEventEmitter.class).emit("GeofencerOnTransitionReceived", array);
-
-//        String js = "setTimeout('geofence.onTransitionReceived("
-//            + Gson.get().toJson(notifications) + ")',0)";
-//        if (webView == null) {
-//            Log.d(TAG, "Webview is null");
-//        } else {
-//            webView.sendJavascript(js);
-//        }
         } catch (Exception e) {
             // EMPTY!
         }

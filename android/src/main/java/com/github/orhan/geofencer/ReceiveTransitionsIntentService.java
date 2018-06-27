@@ -41,6 +41,7 @@ public class ReceiveTransitionsIntentService extends IntentService {
         Logger logger = Logger.getLogger();
         logger.log(Log.DEBUG, "ReceiveTransitionsIntentService - onHandleIntent");
         Intent broadcastIntent = new Intent(GeofenceTransitionIntent);
+
         notifier = new GeoNotificationNotifier(
             (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE),
             this
@@ -49,6 +50,7 @@ public class ReceiveTransitionsIntentService extends IntentService {
         // TODO: refactor this, too long
         // First check for errors
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
+
         if (geofencingEvent.hasError()) {
             // Get the error code with a static method
             int errorCode = geofencingEvent.getErrorCode();
@@ -59,20 +61,26 @@ public class ReceiveTransitionsIntentService extends IntentService {
         } else {
             // Get the type of transition (entry or exit)
             int transitionType = geofencingEvent.getGeofenceTransition();
-            if ((transitionType == Geofence.GEOFENCE_TRANSITION_ENTER)
-                    || (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT)) {
+
+            if ((transitionType == Geofence.GEOFENCE_TRANSITION_ENTER) || (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT)) {
                 logger.log(Log.DEBUG, "Geofence transition detected");
                 List<Geofence> triggerList = geofencingEvent.getTriggeringGeofences();
                 List<GeoNotification> geoNotifications = new ArrayList<GeoNotification>();
+
                 for (Geofence fence : triggerList) {
                     String fenceId = fence.getRequestId();
-                    GeoNotification geoNotification = store
-                            .getGeoNotification(fenceId);
+                    GeoNotification geoNotification = store.getGeoNotification(fenceId);
 
-                    if (geoNotification != null && geoNotification.isWithinTimeRange()) {
+                    if (geoNotification != null && (!geoNotification.happensOnce ||
+                            geoNotification.happensOnce && !geoNotification.showedNotification) && geoNotification.isWithinTimeRange()) {
                         if (geoNotification.notification != null) {
                             notifier.notify(geoNotification.notification);
                         }
+
+                        geoNotification.showedNotification = true;
+                        geoNotification.lastFired = System.currentTimeMillis();
+                        store.setGeoNotification(geoNotification);
+
                         geoNotification.transitionType = transitionType;
                         geoNotifications.add(geoNotification);
                     }

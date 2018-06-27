@@ -38,7 +38,7 @@ func logMessage(messages: [String]) {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(Geofencer.didReceiveLocalNotification),
-            name: NSNotification.Name(rawValue: "RNLocalNotification"),
+            name: NSNotification.Name(rawValue: "RNGeofencerLocalNotification"),
             object: nil
         )
 
@@ -344,15 +344,29 @@ class GeoNotificationManager : CLLocationManager, CLLocationManagerDelegate {
             logMessage(message: "Geofence Event - Firing local notification")
 
             if var geoNotification = try store.findById(id: region.identifier) {
-                if isWithinTimeRange(geoNotification: geoNotification) {
+                if (isWithinTimeRange(geoNotification: geoNotification) && (geoNotification["happensOnce"].boolValue == false
+                        || geoNotification["happensOnce"].boolValue == true && geoNotification["showedNotification"].boolValue == false) ) {
                     geoNotification["transitionType"].int = transitionType
 
                     if geoNotification["notification"].exists() {
                         notifyAbout(geo: geoNotification)
                     }
 
-                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "handleTransition"), object: geoNotification.rawString(String.Encoding.utf8, options: []))
-                    logMessage(message: "Geofence Event - Local notification fired")
+                    do {
+                        let currentDate = Date();
+                        var updatedGeoNotification = JSON(geoNotification);
+                        updatedGeoNotification["showedNotification"] = true;
+                        updatedGeoNotification["lastFired"].int = Int(currentDate.timeIntervalSince1970 * 1000);
+
+                        try addOrUpdateGeoNotification(geoNotification: updatedGeoNotification);
+
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "handleTransition"), object: updatedGeoNotification.rawString(String.Encoding.utf8, options: []))
+                        logMessage(message: "Geofence Event - Local notification fired")
+                    } catch {
+                      logMessage(message: "Failed to update GeoNotification")
+                    }
+                } else {
+                    logMessage(message: "Notification already shown")
                 }
             }
         } catch {

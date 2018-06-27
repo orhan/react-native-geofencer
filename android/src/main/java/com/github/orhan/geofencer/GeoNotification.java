@@ -17,6 +17,9 @@ public class GeoNotification {
     @Expose public int transitionType;
     @Expose public String startTime;
     @Expose public String endTime;
+    @Expose public int lastFired;
+    @Expose public boolean showedNotification;
+    @Expose public boolean happensOnce;
 
     @Expose public Notification notification;
 
